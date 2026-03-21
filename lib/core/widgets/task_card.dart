@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:todo/core/utlis/app_color.dart';
+import 'package:todo/features/home/data/task_model.dart';
 
 class TaskCard extends StatelessWidget {
-  const TaskCard({super.key});
-
+  const TaskCard({super.key, required this.task});
+  final TaskModel task;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -13,10 +14,10 @@ class TaskCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text('Task Title'),
-          Text('Task Description'),
-          Text('Group'),
-          Text('End Time'),
+          Text(task.title??""),
+          Text(task.description??""),
+          Text(task.group??""),
+          Text(task.createdAt??""),
         ],
       ),
     );

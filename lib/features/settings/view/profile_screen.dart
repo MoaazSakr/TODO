@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:todo/core/function/navigation.dart';
-import 'package:todo/features/widgets/header.dart';
+import 'package:todo/core/widgets/header.dart';
 import 'package:todo/features/settings/view/update_profile_screen.dart';
 import 'package:todo/features/settings/view/change_password_screen.dart';
 import 'package:todo/features/settings/view/settings_screen.dart';
-import 'package:todo/features/widgets/settings_container.dart';
+import 'package:todo/core/widgets/settings_container.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

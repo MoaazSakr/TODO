@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:todo/core/function/navigation.dart';
-import 'package:todo/core/services/local_helper.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/features/home/view/home_screen.dart';
 import 'package:todo/features/auth/view/register_screen.dart';
-import 'package:todo/features/widgets/custom_button.dart';
-import 'package:todo/features/widgets/custom_form_widget.dart';
-import 'package:todo/features/widgets/password_form_widget.dart';
+import 'package:todo/core/widgets/custom_button.dart';
+import 'package:todo/core/widgets/custom_form_widget.dart';
+import 'package:todo/core/widgets/password_form_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -17,8 +16,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String name =  AppLocalStorage.getData('name');
-  String password = AppLocalStorage.getData('password');
   bool isPasswordVisible = true;
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
@@ -55,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       text: 'Login',
                       onPressed: () {
                         if (_formKey.currentState?.validate() == true) {
-                          if(_nameController.text == name&&_passwordController.text==password)
+                          if(_nameController.text.isNotEmpty&&_passwordController.text.isNotEmpty)
                             {pushReplacement(context, HomeScreen());}
                         }
                       },

@@ -5,7 +5,7 @@ import 'package:todo/core/function/navigation.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/core/utlis/app_color.dart';
 import 'package:todo/features/task/view/add_task_screen.dart';
-import 'package:todo/features/widgets/header.dart';
+import 'package:todo/core/widgets/header.dart';
 import 'package:todo/features/settings/view/profile_screen.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 268,
                 ),
               ),
-              Gap(100),
+              Spacer(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,

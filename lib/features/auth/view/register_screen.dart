@@ -3,13 +3,12 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:todo/core/function/navigation.dart';
-import 'package:todo/core/services/local_helper.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/features/home/view/home_screen.dart';
 import 'package:todo/features/auth/view/login_screen.dart';
-import 'package:todo/features/widgets/custom_button.dart';
-import 'package:todo/features/widgets/custom_form_widget.dart';
-import 'package:todo/features/widgets/password_form_widget.dart';
+import 'package:todo/core/widgets/custom_button.dart';
+import 'package:todo/core/widgets/custom_form_widget.dart';
+import 'package:todo/core/widgets/password_form_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -63,9 +62,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       text: 'Register',
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          AppLocalStorage.cacheData('name', nameController.text);
-                          AppLocalStorage.cacheData(
-                              'password', _passwordController.text);
                           pushReplacement(context, const HomeScreen());
                         }
                       },

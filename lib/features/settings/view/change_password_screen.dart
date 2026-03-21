@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:todo/core/function/navigation.dart';
-import 'package:todo/core/services/local_helper.dart';
 import 'package:todo/core/utlis/app_assets.dart';
-import 'package:todo/features/settings/view/profile_screen.dart';
-import 'package:todo/features/widgets/custom_button.dart';
-import 'package:todo/features/widgets/password_form_widget.dart';
+import 'package:todo/core/widgets/custom_button.dart';
+import 'package:todo/core/widgets/password_form_widget.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -19,7 +16,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool isShow=false;
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _newPasswordController = TextEditingController();
-  String _checkPasswordController = AppLocalStorage.getData('password');
   
   @override
   Widget build(BuildContext context) {
@@ -50,17 +46,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   text: 'Update',
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      if (_passwordController.text == _checkPasswordController) {
-                        AppLocalStorage.setData('password', _newPasswordController.text);
-                        pop(context, ProfileScreen());
-                      }
-                      else{
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Password is not correct'),
-                          ),
-                        );
-                      }
+                      // if (_passwordController.text) {
+                      //   pop(context, ProfileScreen());
+                      // }
+                      // else{
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text('Password is not correct'),
+                      //     ),
+                      //   );
+                      // }
                     }
                   },
                 ),

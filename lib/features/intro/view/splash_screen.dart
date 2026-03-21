@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:todo/core/cache/cache_helper.dart';
+import 'package:todo/core/cache/cache_keys.dart';
 import 'package:todo/core/function/navigation.dart';
-import 'package:todo/core/services/local_helper.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/features/home/view/home_screen.dart';
 import 'package:todo/features/intro/view/welcome_screen.dart';
@@ -16,12 +17,11 @@ class _SplashScreenState extends State<SplashScreen> {
 void initState() {
   super.initState();
   Future.delayed(const Duration(seconds: 3), () {
-    pushReplacement(
-        context,
-        AppLocalStorage.getData('name').isNotEmpty
-            ? const HomeScreen()
-            : const WelcomeScreen(),
-      );
+   if(CacheHelper.getValue(CacheKeys.accessToken) != null){
+    pushReplacement(context, const HomeScreen());
+   }else{
+    pushReplacement(context, const WelcomeScreen());
+   }
   });
 }
   @override

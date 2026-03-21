@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:todo/core/function/navigation.dart';
-import 'package:todo/core/services/local_helper.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/features/settings/view/profile_screen.dart';
-import 'package:todo/features/widgets/custom_button.dart';
-import 'package:todo/features/widgets/custom_form_widget.dart';
+import 'package:todo/core/widgets/custom_button.dart';
+import 'package:todo/core/widgets/custom_form_widget.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -34,8 +33,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     if (value!.isEmpty) {
                       return 'Please enter your name';
                     } else
-                      AppLocalStorage.setData('name', value);
-                    return null;
+                      return null;
                   },
                   keyboardType: TextInputType.name,
                 ),

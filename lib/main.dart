@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:todo/core/services/local_helper.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:todo/core/cache/cache_helper.dart';
 import 'package:todo/features/intro/view/splash_screen.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  await Hive.openBox('userBox');
-  AppLocalStorage.init();
+  await CacheHelper.init();
   runApp(const MainApp());
 }
 
@@ -16,9 +13,19 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MaterialApp(
+          theme: ThemeData(
+            fontFamily: 'Lexend_Deca'
+          ),
+          debugShowCheckedModeBanner: false,
+          home: SplashScreen(),
+        );
+      },
     );
   }
 }

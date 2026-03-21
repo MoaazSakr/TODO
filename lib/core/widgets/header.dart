@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:todo/core/utlis/app_assets.dart';
-import 'package:todo/core/services/local_helper.dart';
 class Header extends StatefulWidget {
   const Header({super.key });
   @override
@@ -19,7 +18,7 @@ class _HeaderState extends State<Header> {
             backgroundImage: AssetImage(AppAssets.logo),
           ),
           Gap(10),
-          Text('Hello! \n${AppLocalStorage.getData('name')}'),
+          Text('Hello!'),
             ],
     );
   }

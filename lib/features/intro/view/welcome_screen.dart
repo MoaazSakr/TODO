@@ -5,10 +5,10 @@ import 'package:todo/core/function/navigation.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/core/utlis/app_color.dart';
 import 'package:todo/features/auth/view/login_screen.dart';
-import 'package:todo/features/widgets/custom_button.dart';
+import 'package:todo/core/widgets/custom_button.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +20,7 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               children: [
                 SvgPicture.asset(AppAssets.welcome),
+                Gap(20),
                 const Text(
                   'Welcome To Do It !',
                   style: TextStyle(

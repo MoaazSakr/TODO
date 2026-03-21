@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:todo/features/widgets/custom_form_widget.dart';
+import 'package:todo/core/widgets/custom_form_widget.dart';
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({super.key});
@@ -10,6 +10,10 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final List<String> _groups = ['Home', 'Personal', 'Work'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,23 +35,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
          }, keyboardType: TextInputType.text,isDescription: true),         
          Gap(10),
          Container(
-          child: ListTile(
-            title: Text('Group'),
-            trailing: RotatedBox(quarterTurns: 1,child: Icon(Icons.arrow_forward_ios)),
-            onTap: (){
-              showModalBottomSheet(context: context, builder: (context){
-                return Container(
-                  child: Column(
-                    children: [
-                      Text('Home'),
-                      Text('Personal'),
-                      Text('Work'),
-                    ],
-                  ),
-                );
-              });
-            },
-          ),
+          child: DropdownButtonFormField<String>(items: _groups.map((e) => DropdownMenuItem(value: e, child: Text(e),)).toList(), onChanged: (value){
+            setState(() {
+              _formKey.currentState!.validate();
+            });
+
+          },
+          validator: (value) {
+            if (value == null) {
+              return 'Please select a group';
+            }
+            return null;
+          },)
          ),
          Gap(10),
          CustomFormWidget(text: 'End Time', validate: (value) {
