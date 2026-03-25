@@ -1,64 +1,124 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:todo/core/function/navigation.dart';
+import 'package:todo/core/network/api_helper.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/core/utlis/app_color.dart';
+import 'package:todo/features/auth/data/user_model.dart';
+import 'package:todo/features/home/data/task_model.dart';
 import 'package:todo/features/task/view/add_task_screen.dart';
 import 'package:todo/core/widgets/header.dart';
+import 'package:todo/core/widgets/task_item_builder.dart';
+import 'package:todo/features/task/view/edit_task_screen.dart';
 import 'package:todo/features/settings/view/profile_screen.dart';
+
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.userModel});
+  
+  final UserModel? userModel;
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<TaskModel> tasks = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTasks();
+  }
+
+  void fetchTasks() async {
+    setState(() => isLoading = true);
+    var result = await APIHelper.getTasks();
+    result.fold(
+      (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: AppColor.errorColor)
+        );
+        setState(() => isLoading = false);
+      },
+      (tasksList) {
+        setState(() {
+          tasks = tasksList;
+          isLoading = false;
+        });
+      }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // استخدام Navigator.push بدلاً من الدالة المخصصة لنتمكن من استخدام await
+          // هذا يضمن أن fetchTasks لن تعمل إلا بعد أن تُغلق شاشة إضافة المهمة
+          await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddTaskScreen()));
+          fetchTasks(); 
+        },
+        backgroundColor: AppColor.primaryColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(onTap: () => push(context, ProfileScreen()),child: Header()),
-              Gap(40),
-              SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text("There are no tasks yet,"),
-                    Text("Press the button"),
-                    Text("add New Task "),
-                  ],
-                ),
+              GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())), 
+                child: const Header()
               ),
-              Center(
-                child: SvgPicture.asset(
-                  AppAssets.task,
-                  height: 268,
-                  width: 268,
-                ),
-              ),
-              Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: AppColor.primaryColor,
-                    child: IconButton(
-                      onPressed: () {
-                        push(context, AddTaskScreen());
-                      },
-                      icon: Icon(Icons.note_add_outlined),
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+              const Gap(20),
+              Expanded(
+                child: isLoading 
+                    ? const Center(child: CircularProgressIndicator(color: AppColor.primaryColor))
+                    : tasks.isEmpty
+                        ? RefreshIndicator(
+                            onRefresh: () async => fetchTasks(),
+                            color: AppColor.primaryColor,
+                            // وضعنا ScrollView حتى لو كانت القائمة فارغة لكي يعمل الـ RefreshIndicator
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Gap(80),
+                                  const Text(
+                                    "There are no tasks yet,\nPress the button\nTo add New Task", 
+                                    textAlign: TextAlign.center, 
+                                    style: TextStyle(color: AppColor.greyColor, fontSize: 16)
+                                  ),
+                                  const Gap(20),
+                                  SvgPicture.asset(AppAssets.task, height: 268, width: 268),
+                                ],
+                              ),
+                            ),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: () async => fetchTasks(),
+                            color: AppColor.primaryColor,
+                            child: ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemCount: tasks.length,
+                              separatorBuilder: (context, index) => const Gap(15),
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () async {
+                                    // انتظار العودة من شاشة التعديل أو الحذف لتحديث القائمة فوراً
+                                    await Navigator.push(context, MaterialPageRoute(builder: (context) => EditTaskScreen(task: tasks[index])));
+                                    fetchTasks(); 
+                                  },
+                                  child: TaskItemBuilder(task: tasks[index]),
+                                );
+                              },
+                            ),
+                          ),
               ),
             ],
           ),

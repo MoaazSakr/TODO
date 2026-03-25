@@ -18,6 +18,7 @@ dependencies:
   shared_preferences: ^2.5.4
   dartz: ^0.10.1
   dio: ^5.9.2
+  image_picker: ^1.2.1
 
 dev_dependencies:
   flutter_test:
@@ -29,6 +30,8 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/icons/
+    - assets/fonts/
   fonts:
     - family: Lexend_Deca
       fonts:

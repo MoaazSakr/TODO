@@ -1,51 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:todo/core/utlis/app_color.dart';
 
-// ignore: must_be_immutable
 class CustomFormWidget extends StatelessWidget {
   CustomFormWidget({
     super.key,
+    this.prefixIconPath,
     required this.text,
-    this.icon,
-    required this.validate,
+    this.validate,
     required this.keyboardType,
-    this.isDescription =false
+    this.isDescription = false,
+    this.readOnly = false,
+    this.onTap,
+    this.controller,
   });
-  final String text;
-  final IconData? icon;
+
+  final String? prefixIconPath;
+  final String? text;
+  final String? Function(String?)? validate;
   final TextInputType keyboardType;
-  final String? Function(String?) validate;
-  bool isDescription;
+  final bool isDescription;
+  final bool readOnly;
+  final void Function()? onTap;
+  final TextEditingController? controller;
+
   @override
   Widget build(BuildContext context) {
-    var inputDecoration2 = InputDecoration(
-      hintText: 'enter your $text',
-      prefixIcon: Icon(icon),
-      fillColor: AppColor.backgroundColor,
-      filled: true,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: AppColor.greyColor),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: AppColor.greyColor),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: AppColor.errorColor),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: AppColor.errorColor),
-      ),
-    );
-    var inputDecoration = inputDecoration2;
     return TextFormField(
-      keyboardType:  keyboardType,
+      controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
+      maxLines: isDescription ? 4 : 1, // تكبير الحقل إذا كان للوصف
+      style: TextStyle(
+          color: AppColor.textColor,
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w400),
+      decoration: InputDecoration(
+        hintText: text, // تعديل الـ hint ليكون متطابق مع التصميم
+        hintStyle: TextStyle(
+            color: AppColor.greyColor,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w100),
+        prefixIcon: prefixIconPath == null
+            ? null
+            : Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: SvgPicture.asset(prefixIconPath!),
+              ),
+        contentPadding: REdgeInsets.symmetric(horizontal: 16, vertical: 22),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.r),
+            borderSide: const BorderSide(color: AppColor.accentColor, width: 1)),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.r),
+            borderSide: const BorderSide(color: AppColor.accentColor, width: 1)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.r),
+            borderSide: const BorderSide(color: AppColor.primaryColor, width: 1)),
+      ),
       validator: validate,
-      decoration: inputDecoration,
-      maxLines:isDescription ? 4:1 ,
+      keyboardType: keyboardType,
     );
   }
 }
