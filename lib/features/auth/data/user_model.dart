@@ -16,6 +16,9 @@ class UserModel {
     "image_path": imagePath,
     "username": username
   };
+  getUserName(){
+    return username;
+  }
 
 
 }

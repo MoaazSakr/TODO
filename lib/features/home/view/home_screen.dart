@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:todo/core/function/navigation.dart';
 import 'package:todo/core/network/api_helper.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/core/utlis/app_color.dart';
@@ -25,16 +24,38 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<TaskModel> tasks = [];
   bool isLoading = true;
+  UserModel? currentUser;
 
   @override
   void initState() {
     super.initState();
+    currentUser = widget.userModel;
     fetchTasks();
+    
+    // جلب بيانات المستخدم إذا كانت غير موجودة (مثل فتح التطبيق من Splash)
+    if (currentUser == null) {
+      fetchUser();
+    }
+  }
+
+  void fetchUser() async {
+    var result = await APIHelper.getUserData();
+    result.fold(
+      (error) {}, 
+      (user) {
+        if (mounted) {
+          setState(() {
+            currentUser = user;
+          });
+        }
+      }
+    );
   }
 
   void fetchTasks() async {
     setState(() => isLoading = true);
     var result = await APIHelper.getTasks();
+    if (!mounted) return;
     result.fold(
       (error) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -56,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await push(context, const AddTaskScreen());
+          await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddTaskScreen()));
           fetchTasks(); 
         },
         backgroundColor: AppColor.primaryColor,
@@ -70,8 +91,11 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: () => push(context, const ProfileScreen()),
-                child: Header()
+                onTap: () async {
+                  await Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(userModel: currentUser)));
+                  fetchUser(); // تحديث الاسم في حالة تم تعديله من صفحة البروفايل
+                },
+                child: Header(userModel: currentUser)
               ),
               const Gap(20),
               Expanded(
@@ -108,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   onTap: () async {
-                                    await push(context, EditTaskScreen(task: tasks[index]));
+                                    await Navigator.push(context, MaterialPageRoute(builder: (context) => EditTaskScreen(task: tasks[index])));
                                     fetchTasks(); 
                                   },
                                   child: TaskItemBuilder(task: tasks[index]),

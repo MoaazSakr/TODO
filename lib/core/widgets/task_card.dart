@@ -17,7 +17,7 @@ class TaskCard extends StatelessWidget {
           Text(task.title??""),
           Text(task.description??""),
           Text(task.group??""),
-          Text(task.createdAt??""),
+          Text(task.endTime??""),
         ],
       ),
     );

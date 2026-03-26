@@ -20,7 +20,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   TextEditingController _newPasswordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
-
   void changePassword() async {
     if (_formKey.currentState?.validate() == true) {
       setState(() => _isLoading = true);
@@ -50,7 +49,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             children: [
               Container(
                 height: 250,
-                width: double.infinity,
+                  width: double.infinity,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage(AppAssets.logo), 
@@ -68,6 +67,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         text: 'Old Password',
                         controller: _oldPasswordController,
                         prefixIconPath: AppIcons.password,
+                        isPassword: true,
                         validate: (value) {
                           if (value == null || value.isEmpty) return 'Enter old password';
                           return null;
@@ -79,6 +79,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         text: 'New Password',
                         controller: _newPasswordController,
                         prefixIconPath: AppIcons.password,
+                        isPassword: true,
                         validate: (value) {
                           String? errorMessage = validatePassword(value);
                           if (errorMessage != null) {
@@ -93,6 +94,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         text: 'Confirm Password',
                         controller: _confirmPasswordController,
                         prefixIconPath: AppIcons.password,
+                        isPassword: true,
                         validate: (value) {
                           if (value != _newPasswordController.text) {
                             return 'Passwords do not match';

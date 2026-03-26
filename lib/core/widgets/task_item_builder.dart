@@ -50,7 +50,7 @@ class TaskItemBuilder extends StatelessWidget {
             ),
           ),
           SizedBox(width: 20.w,),
-          Text(task.createdAt??"",
+          Text(task.endTime??"",
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: AppColor.greyColor,

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:todo/core/function/navigation.dart';
 import 'package:todo/core/function/password_validate.dart';
 import 'package:todo/core/network/api_helper.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/core/utlis/app_color.dart';
 import 'package:todo/features/auth/data/user_model.dart';
-import 'package:todo/features/home/view/home_screen.dart';
 import 'package:todo/features/auth/view/login_screen.dart';
+import 'package:todo/features/home/view/home_screen.dart';
 import 'package:todo/core/widgets/custom_button.dart';
 import 'package:todo/core/widgets/custom_form_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key,});
+  const RegisterScreen({super.key});
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
@@ -22,18 +22,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   bool isLoading = false;
-
+  
   void register() async {
     if (_formKey.currentState?.validate() == true) {
       setState(() {
         isLoading = true;
       });
+      
       var result = await APIHelper.register(
         username: _nameController.text,
         password: _passwordController.text,
       );
+      
       result.fold(
         (String error) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(error, style: const TextStyle(color: AppColor.backgroundColor)),
@@ -41,20 +44,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           );
         },
-        (UserModel userModel) async {
+        (UserModel userModel) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Registration successful\n Welcome ${userModel.username}', style: const TextStyle(color: AppColor.backgroundColor)),
               backgroundColor: AppColor.primaryColor,
             ),
           );
-          LoginScreen().login();
-          pushReplacement(context, const HomeScreen());
+          
+          // التوجيه المباشر للشاشة الرئيسية 
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen(userModel: userModel)),
+            (route) => false,
+          );
         },
       );
-      setState(() {
-        isLoading = false;
-      });
+      
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -66,7 +78,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             children: [
               Container(
-                height: 298,
+                height: 298.h, // استخدام .h لتكون متجاوبة
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
@@ -76,7 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.0.r), // استخدام .r لضبط الحواف والمسافات
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -93,11 +105,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           return null;
                         },
                       ),
-                      const Gap(10),
+                      Gap(10.h),
                       CustomFormWidget(
                         text: 'Password',
                         controller: _passwordController,
                         prefixIconPath: AppIcons.password,
+                        isPassword: true,
                         validate: (value) {
                           String? errorMessage = validatePassword(value);
                           if (errorMessage != null) {
@@ -107,19 +120,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                         keyboardType: TextInputType.visiblePassword,
                       ),
-                      const Gap(10),
+                      Gap(10.h),
                       CustomFormWidget(
                         text: 'Confirm Password',
                         prefixIconPath: AppIcons.password,
+                        isPassword: true,
                         validate: (value) {
                           if (value != _passwordController.text) {
                             return 'Passwords do not match';
                           }
                           return null;
-                        },
-                        keyboardType: TextInputType.visiblePassword,
-                      ),
-                      const Gap(20),
+                        },),
+                      Gap(20.h),
                       isLoading 
                           ? const CircularProgressIndicator(color: AppColor.primaryColor)
                           : CustomButton(
@@ -130,22 +142,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
-              const Gap(10),
+              Gap(10.h),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Already Have An Account?'),
-                  const Gap(4),
+                  Text('Already Have An Account?', style: TextStyle(fontSize: 14.sp)),
+                  Gap(4.w),
                   TextButton(
                     onPressed: () {
-                      pushReplacement(context, const LoginScreen());
+                      Navigator.pushReplacement(
+                        context, 
+                        MaterialPageRoute(builder: (context) => const LoginScreen())
+                      );
                     },
-                    child: const Text('Login', style: TextStyle(color: AppColor.primaryColor)),
+                    child: Text('Login', style: TextStyle(color: AppColor.primaryColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
-              const Gap(20),
+              Gap(20.h),
             ],
           ),
         ),

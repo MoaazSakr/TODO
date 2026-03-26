@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:todo/core/cache/cache_helper.dart';
 import 'package:todo/core/cache/cache_keys.dart';
 import 'package:todo/features/auth/data/login_response_model.dart';
-import 'package:todo/features/auth/data/register_response_model.dart';
 import 'package:todo/features/auth/data/user_model.dart';
 import '../../features/home/data/task_model.dart';
 
@@ -21,15 +20,12 @@ abstract class APIHelper {
           return handler.next(options);
         },
         onError: (DioException e, handler) async {
-          // إذا كان التوكن منتهي الصلاحية (401)
           if (e.response?.statusCode == 401) {
-            bool isRefreshed = await refreshToken(); // جلب توكن جديد
+            bool isRefreshed = await refreshToken(); 
             if (isRefreshed) {
-              // إعادة محاولة الريكويست الأصلي بالتوكن الجديد
               final newToken = await CacheHelper.getValue(CacheKeys.accessToken);
               e.requestOptions.headers['Authorization'] = 'Bearer $newToken';
               try {
-                // نستخدم Dio جديد لمنع تكرار اللوب (Infinite loop)
                 final retryDio = Dio();
                 final retryResponse = await retryDio.fetch(e.requestOptions);
                 return handler.resolve(retryResponse);
@@ -43,9 +39,6 @@ abstract class APIHelper {
       ),
     );
 
-  // ===========================================================================
-  // دالة تحديث التوكن (Refresh Token) 
-  // ===========================================================================
   static Future<bool> refreshToken() async {
     try {
       final refreshTokenStr = await CacheHelper.getValue(CacheKeys.refreshToken);
@@ -58,7 +51,6 @@ abstract class APIHelper {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final newAccessToken = response.data['access_token'];
-        // إذا لم يرسل السيرفر refresh token جديد، نحتفظ بالقديم
         final newRefreshToken = response.data['refresh_token'] ?? refreshTokenStr;
         
         await CacheHelper.setValue(CacheKeys.accessToken, newAccessToken);
@@ -67,13 +59,9 @@ abstract class APIHelper {
       }
       return false;
     } catch (e) {
-      return false; // فشل التحديث (يحتاج المستخدم لتسجيل الدخول مجدداً)
+      return false; 
     }
   }
-
-  // ===========================================================================
-  // عمليات المصادقة والمستخدم (Auth & User Operations)
-  // ===========================================================================
 
   static Future<Either<String, UserModel>> login({
     required String username,
@@ -108,19 +96,24 @@ abstract class APIHelper {
     required String password,
   }) async {
     try {
-      var registerResponse = await _dio.post(
+      // 1. نقوم بإنشاء الحساب في الـ API
+      await _dio.post(
         'register',
         data: FormData.fromMap({
           'username': username,
           'password': password,
         }),
       );
-      var registerResponseModel = RegisterResponseModel.fromJson(registerResponse.data as Map<String, dynamic>);
+      
+      // 2. التريك السحري: بما أن الـ Register مش بيرجع توكن، هنعمل Login تلقائي!
+      // الدالة دي هتروح تجيب التوكن، تحفظه في الكاش، وترجع بيانات المستخدم بأمان
+      var loginResult = await login(username: username, password: password);
+      
+      return loginResult.fold(
+        (error) => Left(error),
+        (userModel) => Right(userModel),
+      );
 
-      await CacheHelper.setValue(CacheKeys.accessToken, registerResponseModel.accessToken!);
-      await CacheHelper.setValue(CacheKeys.refreshToken, registerResponseModel.refreshToken!);
-
-      return Right(registerResponseModel.userModel!);
     } catch (e) {
       if (e is DioException) {
         var errorResponse = e.response?.data as Map<String, dynamic>?;
@@ -136,13 +129,11 @@ abstract class APIHelper {
       var response = await _dio.post('logout');
       var successResponse = response.data as Map<String, dynamic>;
       
-      // مسح بيانات الجلسة من الكاش
       await CacheHelper.removeValue(CacheKeys.accessToken);
       await CacheHelper.removeValue(CacheKeys.refreshToken);
 
       return Right(successResponse['message'] ?? 'تم تسجيل الخروج بنجاح');
     } catch (e) {
-      // في حالة فشل الاتصال بالخادم، نقوم بمسح التوكن محلياً كإجراء احتياطي
       await CacheHelper.removeValue(CacheKeys.accessToken);
       await CacheHelper.removeValue(CacheKeys.refreshToken);
       return const Right('تم تسجيل الخروج محلياً');
@@ -229,10 +220,6 @@ abstract class APIHelper {
       }
     }
   }
-
-  // ===========================================================================
-  // عمليات المهام (Tasks Operations)
-  // ===========================================================================
 
   static Future<Either<String, List<TaskModel>>> getTasks() async {
     try {

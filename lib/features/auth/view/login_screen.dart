@@ -24,7 +24,6 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   bool isLoading = false;
-  
   login() async{
     if(_formKey.currentState?.validate() == true){
       setState(() {
@@ -95,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: 'Password',
                         controller: _passwordController,
                         prefixIconPath: AppIcons.password,
+                        isPassword: true,
                         validate: (value) {
                           String? errorMessage = validatePassword(value);
                           if (errorMessage != null) {
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           _passwordController.text = value ?? '';
                           return null;
                         },
-                        keyboardType: TextInputType.visiblePassword,
+                        
                       ),
                       Gap(20),
                       isLoading 

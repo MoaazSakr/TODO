@@ -25,4 +25,5 @@ class LoginResponseModel{
     }
     return data;
   }
+  get username => userModel?.username;
 }

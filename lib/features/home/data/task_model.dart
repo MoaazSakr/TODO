@@ -1,15 +1,15 @@
 class TaskModel{
-  String? createdAt;
+  String? endTime;
   String? description;
   int? id;
   String? imagePath;
   String? title;
   String? group;
 
-  TaskModel({this.createdAt, this.description, this.id, this.imagePath, this.title});
+  TaskModel({this.endTime, this.description, this.id, this.imagePath, this.title});
 
   TaskModel.fromJson(Map<String, dynamic> json){
-    createdAt = json['created_at'];
+    endTime = json['end_time'];
     description = json['description'];
     id = json['id'];
     imagePath = json['image_path'];
@@ -18,7 +18,7 @@ class TaskModel{
 
   Map<String, dynamic> toJson(){
     return {
-      'created_at': createdAt,
+      'end_time': endTime,
       'description': description,
       'id': id,
       'image_path': imagePath,

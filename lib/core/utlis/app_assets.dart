@@ -8,11 +8,11 @@ class AppIcons {
   static const String person = 'assets/icons/person.svg';
   static const String lock = 'assets/icons/lock.svg';
   static const String unlock = 'assets/icons/unlock.svg';
-  static const String password = 'assets/icons/password.svg';
+  static const String password = 'assets/icons/password_key.svg';
   static const String settings = 'assets/icons/settings.svg';
   static const String personGroup = 'assets/icons/person_group.svg';
   static const String delete = 'assets/icons/delete.svg';
-  static const String jobGroup = 'assets/icons/job_group.svg';
+  static const String workGroup = 'assets/icons/work_group.svg';
   static const String homeGroup = 'assets/icons/home_group.svg';
   static const String date = 'assets/icons/date.svg';
   static const String addTask = 'assets/icons/add_task.svg';

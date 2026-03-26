@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:todo/core/utlis/app_assets.dart';
-import 'package:todo/features/auth/data/login_response_model.dart';
+import 'package:todo/features/auth/data/user_model.dart';
 
-class Header extends StatefulWidget {
-  Header({super.key});
-  @override
-  State<Header> createState() => _HeaderState();
-}
+class Header extends StatelessWidget {
+  const Header({super.key, this.userModel});
+  
+  final UserModel? userModel;
 
-class _HeaderState extends State<Header> {
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        CircleAvatar(radius: 30, backgroundImage: AssetImage(AppAssets.logo)),
-        Gap(10),
+        const CircleAvatar(radius: 30, backgroundImage: AssetImage(AppAssets.logo)),
+        const Gap(10),
         Text(
-          "Hello, \n${LoginResponseModel().userModel?.username ?? 'User'}",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
+          'Hello, ${userModel?.username ?? 'User'}',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        )
       ],
     );
   }
