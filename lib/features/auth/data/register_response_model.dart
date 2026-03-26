@@ -6,17 +6,25 @@ class RegisterResponseModel {
   String? accessToken;
   String? refreshToken;
 
-  RegisterResponseModel({this.status, this.userModel});
+  RegisterResponseModel({this.status, this.userModel, this.accessToken, this.refreshToken});
 
   factory RegisterResponseModel.fromJson(Map<String, dynamic> json) {
-    return RegisterResponseModel(
+    var model = RegisterResponseModel(
       status: json['status'],
-      userModel: UserModel.fromJson(json['user']),
+      userModel: json['user'] != null ? UserModel.fromJson(json['user']) : null,
     );
+    
+    model.accessToken = json['access_token'];
+    model.refreshToken = json['refresh_token'];
+    
+    return model;
   }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['status'] = status;
+    data['access_token'] = accessToken;
+    data['refresh_token'] = refreshToken;
     if (userModel != null) {
       data['user'] = userModel!.toJson();
     }

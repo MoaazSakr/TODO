@@ -13,6 +13,7 @@ import 'package:todo/core/widgets/custom_form_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
+  void login() async {}
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -29,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         isLoading = true;
       });
-      var result = await APIHelper.login(username: _nameController.text, password: _passwordController.text);
+      var result = await APIHelper.login
+      (username: _nameController.text, password: _passwordController.text);
       result.fold(
           (String error){
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -55,81 +57,83 @@ class _LoginScreenState extends State<LoginScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 298,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(AppAssets.logo), // يمكنك تغييرها لتطابق التصميم
-                  fit: BoxFit.cover,
+    return SafeArea(
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: 298,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(AppAssets.logo),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    CustomFormWidget(
-                      text: 'Name',
-                      controller: _nameController,
-                      prefixIconPath: AppIcons.person,
-                      validate: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your name';
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.name,
-                    ),
-                    Gap(10),
-                   CustomFormWidget(
-                      text: 'Password',
-                      controller: _passwordController,
-                      prefixIconPath: AppIcons.password,
-                      validate: (value) {
-                        String? errorMessage = validatePassword(value);
-                        if (errorMessage != null) {
-                          return errorMessage;
-                        }
-                        _passwordController.text = value ?? '';
-                        return null;
-                      },
-                      keyboardType: TextInputType.visiblePassword,
-                    ),
-                    Gap(20),
-                    isLoading 
-                        ? CircularProgressIndicator(color: AppColor.primaryColor)
-                        : CustomButton(
-                            text: 'Login',
-                            onPressed: login,
-                          ),
-                  ],
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      CustomFormWidget(
+                        text: 'Name',
+                        controller: _nameController,
+                        prefixIconPath: AppIcons.person,
+                        validate: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.name,
+                      ),
+                      Gap(10),
+                     CustomFormWidget(
+                        text: 'Password',
+                        controller: _passwordController,
+                        prefixIconPath: AppIcons.password,
+                        validate: (value) {
+                          String? errorMessage = validatePassword(value);
+                          if (errorMessage != null) {
+                            return errorMessage;
+                          }
+                          _passwordController.text = value ?? '';
+                          return null;
+                        },
+                        keyboardType: TextInputType.visiblePassword,
+                      ),
+                      Gap(20),
+                      isLoading 
+                          ? CircularProgressIndicator(color: AppColor.primaryColor)
+                          : CustomButton(
+                              text: 'Login',
+                              onPressed: login,
+                            ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Gap(10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Don't Have An Account?"),
-                Gap(4),
-                TextButton(
-                  onPressed: () {
-                    push(context, RegisterScreen());
-                  },
-                  child: Text('Register', style: TextStyle(color: AppColor.primaryColor)),
-                ),
-              ],
-            ),
-            Gap(20),
-          ],
+              Gap(10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Don't Have An Account?"),
+                  Gap(4),
+                  TextButton(
+                    onPressed: () {
+                      push(context, RegisterScreen());
+                    },
+                    child: Text('Register', style: TextStyle(color: AppColor.primaryColor)),
+                  ),
+                ],
+              ),
+              Gap(20),
+            ],
+          ),
         ),
       ),
     );

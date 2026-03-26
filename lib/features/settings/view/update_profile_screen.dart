@@ -36,51 +36,53 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Update Profile'), centerTitle: true),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 250,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(AppAssets.logo), 
-                  fit: BoxFit.cover,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Update Profile'), centerTitle: true),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: 250,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(AppAssets.logo), 
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    CustomFormWidget(
-                      text: 'Username',
-                      controller: _usernameController,
-                      prefixIconPath: AppIcons.person,
-                      validate: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your username';
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.name,
-                    ),
-                    const Gap(20),
-                    _isLoading
-                        ? const CircularProgressIndicator(color: AppColor.primaryColor)
-                        : CustomButton(
-                            text: 'Update',
-                            onPressed: _updateProfile,
-                          ),
-                  ],
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      CustomFormWidget(
+                        text: 'Username',
+                        controller: _usernameController,
+                        prefixIconPath: AppIcons.person,
+                        validate: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your username';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.name,
+                      ),
+                      const Gap(20),
+                      _isLoading
+                          ? const CircularProgressIndicator(color: AppColor.primaryColor)
+                          : CustomButton(
+                              text: 'Update',
+                              onPressed: _updateProfile,
+                            ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

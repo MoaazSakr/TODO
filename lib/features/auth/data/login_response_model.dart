@@ -24,5 +24,5 @@ class LoginResponseModel{
       data['user'] = userModel!.toJson();
     }
     return data;
-  } 
+  }
 }

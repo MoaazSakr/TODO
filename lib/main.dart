@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:todo/core/cache/cache_helper.dart';
 import 'package:todo/features/intro/view/splash_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await CacheHelper.init();
@@ -20,8 +21,8 @@ class MainApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           theme: ThemeData(
-            fontFamily: 'Lexend_Deca'
-          ),
+            textTheme: GoogleFonts.lexendDecaTextTheme(),
+            ),
           debugShowCheckedModeBanner: false,
           home: SplashScreen(),
         );

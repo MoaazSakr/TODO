@@ -19,6 +19,7 @@ dependencies:
   dartz: ^0.10.1
   dio: ^5.9.2
   image_picker: ^1.2.1
+  google_fonts: ^8.0.2
 
 dev_dependencies:
   flutter_test:
@@ -31,16 +32,3 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-    - assets/fonts/
-  fonts:
-    - family: Lexend_Deca
-      fonts:
-        - asset: assets/fonts/Lexend_Deca/LexendDeca-Black.ttf
-        - asset: assets/fonts/Lexend_Deca/LexendDeca-Bold.ttf
-        - asset: assets/fonts/Lexend_Deca/LexendDeca-ExtraBold.ttf
-        - asset: assets/fonts/Lexend_Deca/LexendDeca-ExtraLight.ttf
-        - asset: assets/fonts/Lexend_Deca/LexendDeca-Light.ttf
-        - asset: assets/fonts/Lexend_Deca/LexendDeca-Medium.ttf
-        - asset: assets/fonts/Lexend_Deca/LexendDeca-Regular.ttf
-        - asset: assets/fonts/Lexend_Deca/LexendDeca-SemiBold.ttf
-        - asset: assets/fonts/Lexend_Deca/LexendDeca-Thin.ttf

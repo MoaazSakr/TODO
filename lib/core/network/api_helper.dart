@@ -20,11 +20,56 @@ abstract class APIHelper {
           }
           return handler.next(options);
         },
-        onError: (DioException e, handler) {
+        onError: (DioException e, handler) async {
+          // إذا كان التوكن منتهي الصلاحية (401)
+          if (e.response?.statusCode == 401) {
+            bool isRefreshed = await refreshToken(); // جلب توكن جديد
+            if (isRefreshed) {
+              // إعادة محاولة الريكويست الأصلي بالتوكن الجديد
+              final newToken = await CacheHelper.getValue(CacheKeys.accessToken);
+              e.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+              try {
+                // نستخدم Dio جديد لمنع تكرار اللوب (Infinite loop)
+                final retryDio = Dio();
+                final retryResponse = await retryDio.fetch(e.requestOptions);
+                return handler.resolve(retryResponse);
+              } catch (retryError) {
+                return handler.next(e);
+              }
+            }
+          }
           return handler.next(e);
         },
       ),
     );
+
+  // ===========================================================================
+  // دالة تحديث التوكن (Refresh Token) 
+  // ===========================================================================
+  static Future<bool> refreshToken() async {
+    try {
+      final refreshTokenStr = await CacheHelper.getValue(CacheKeys.refreshToken);
+      if (refreshTokenStr == null) return false;
+
+      final refreshDio = Dio(BaseOptions(baseUrl: 'https://ntitodo-production-779a.up.railway.app/api/'));
+      final response = await refreshDio.post('refresh', data: FormData.fromMap({
+        'refresh_token': refreshTokenStr,
+      }));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final newAccessToken = response.data['access_token'];
+        // إذا لم يرسل السيرفر refresh token جديد، نحتفظ بالقديم
+        final newRefreshToken = response.data['refresh_token'] ?? refreshTokenStr;
+        
+        await CacheHelper.setValue(CacheKeys.accessToken, newAccessToken);
+        await CacheHelper.setValue(CacheKeys.refreshToken, newRefreshToken);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false; // فشل التحديث (يحتاج المستخدم لتسجيل الدخول مجدداً)
+    }
+  }
 
   // ===========================================================================
   // عمليات المصادقة والمستخدم (Auth & User Operations)
@@ -83,6 +128,24 @@ abstract class APIHelper {
       } else {
         return Left('حدث خطأ بالاتصال.\nحاول مرة أخرى لاحقاً');
       }
+    }
+  }
+
+  static Future<Either<String, String>> logout() async {
+    try {
+      var response = await _dio.post('logout');
+      var successResponse = response.data as Map<String, dynamic>;
+      
+      // مسح بيانات الجلسة من الكاش
+      await CacheHelper.removeValue(CacheKeys.accessToken);
+      await CacheHelper.removeValue(CacheKeys.refreshToken);
+
+      return Right(successResponse['message'] ?? 'تم تسجيل الخروج بنجاح');
+    } catch (e) {
+      // في حالة فشل الاتصال بالخادم، نقوم بمسح التوكن محلياً كإجراء احتياطي
+      await CacheHelper.removeValue(CacheKeys.accessToken);
+      await CacheHelper.removeValue(CacheKeys.refreshToken);
+      return const Right('تم تسجيل الخروج محلياً');
     }
   }
 

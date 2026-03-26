@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:todo/core/function/navigation.dart';
 import 'package:todo/core/network/api_helper.dart';
 import 'package:todo/core/utlis/app_assets.dart';
 import 'package:todo/core/utlis/app_color.dart';
@@ -55,14 +56,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // استخدام Navigator.push بدلاً من الدالة المخصصة لنتمكن من استخدام await
-          // هذا يضمن أن fetchTasks لن تعمل إلا بعد أن تُغلق شاشة إضافة المهمة
-          await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddTaskScreen()));
+          await push(context, const AddTaskScreen());
           fetchTasks(); 
         },
         backgroundColor: AppColor.primaryColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        child: const Icon(Icons.add, color: Colors.white),
+        child: SvgPicture.asset(AppIcons.addTask, height: 24, width: 24),
       ),
       body: SafeArea(
         child: Padding(
@@ -71,8 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())), 
-                child: const Header()
+                onTap: () => push(context, const ProfileScreen()),
+                child: Header()
               ),
               const Gap(20),
               Expanded(
@@ -82,7 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ? RefreshIndicator(
                             onRefresh: () async => fetchTasks(),
                             color: AppColor.primaryColor,
-                            // وضعنا ScrollView حتى لو كانت القائمة فارغة لكي يعمل الـ RefreshIndicator
                             child: SingleChildScrollView(
                               physics: const AlwaysScrollableScrollPhysics(),
                               child: Column(
@@ -110,8 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   onTap: () async {
-                                    // انتظار العودة من شاشة التعديل أو الحذف لتحديث القائمة فوراً
-                                    await Navigator.push(context, MaterialPageRoute(builder: (context) => EditTaskScreen(task: tasks[index])));
+                                    await push(context, EditTaskScreen(task: tasks[index]));
                                     fetchTasks(); 
                                   },
                                   child: TaskItemBuilder(task: tasks[index]),
