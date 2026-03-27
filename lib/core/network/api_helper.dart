@@ -7,8 +7,9 @@ import 'package:todo/features/auth/data/user_model.dart';
 import '../../features/home/data/task_model.dart';
 
 abstract class APIHelper {
+  static const String endpoint = 'https://ntitodo-production-779a.up.railway.app/api/';
   static final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'https://ntitodo-production-779a.up.railway.app/api/',
+    baseUrl: endpoint,
     receiveDataWhenStatusError: true,
   ))..interceptors.add(
       InterceptorsWrapper(
@@ -44,7 +45,7 @@ abstract class APIHelper {
       final refreshTokenStr = await CacheHelper.getValue(CacheKeys.refreshToken);
       if (refreshTokenStr == null) return false;
 
-      final refreshDio = Dio(BaseOptions(baseUrl: 'https://ntitodo-production-779a.up.railway.app/api/'));
+      final refreshDio = Dio(BaseOptions(baseUrl: endpoint));
       final response = await refreshDio.post('refresh', data: FormData.fromMap({
         'refresh_token': refreshTokenStr,
       }));
