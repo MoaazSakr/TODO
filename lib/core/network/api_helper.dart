@@ -8,38 +8,66 @@ import '../../features/home/data/task_model.dart';
 
 abstract class APIHelper {
   static const String endpoint = 'https://ntitodo-production-779a.up.railway.app/api/';
+  
   static final Dio _dio = Dio(BaseOptions(
     baseUrl: endpoint,
     receiveDataWhenStatusError: true,
   ))..interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          // جلب التوكن وإضافته للهيدر تلقائياً في كل الطلبات (عشان متكتبوش كل شوية)
           final token = await CacheHelper.getValue(CacheKeys.accessToken);
-          if (token != null) {
+          if (token != null && token.toString().isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
           return handler.next(options);
         },
-        onError: (DioException e, handler) async {
-          if (e.response?.statusCode == 401) {
-            bool isRefreshed = await refreshToken(); 
+        onError: (DioException error, handler) async {
+          // حل مشكلة انتهاء التوكن وإعادة بناء الـ FormData (مأخوذة من الكود المرجعي)
+          var errorResponse = error.response?.data;
+          
+          if (errorResponse != null && errorResponse is Map && 
+              (errorResponse['message'].toString().contains('Token has expired.') || error.response?.statusCode == 401)) {
+            
+            bool isRefreshed = await refreshToken();
+            
             if (isRefreshed) {
-              final newToken = await CacheHelper.getValue(CacheKeys.accessToken);
-              e.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+              final options = error.requestOptions;
+              
+              // إعادة بناء الـ FormData لمنع حدوث كراش
+              if (options.data is FormData) {
+                final oldFormData = options.data as FormData;
+                final Map<String, dynamic> formMap = {};
+                for (var entry in oldFormData.fields) {
+                  formMap[entry.key] = entry.value;
+                }
+                for (var file in oldFormData.files) {
+                  formMap[file.key] = file.value;
+                }
+                options.data = FormData.fromMap(formMap);
+              }
+              
+              // وضع التوكن الجديد
+              options.headers['Authorization'] = 'Bearer ${await CacheHelper.getValue(CacheKeys.accessToken) ?? ''}';
+              
               try {
-                final retryDio = Dio();
-                final retryResponse = await retryDio.fetch(e.requestOptions);
-                return handler.resolve(retryResponse);
-              } catch (retryError) {
-                return handler.next(e);
+                // إعادة إرسال الطلب الأصلي
+                final retryDio = Dio(BaseOptions(baseUrl: endpoint));
+                final response = await retryDio.fetch(options);
+                return handler.resolve(response);
+              } catch (e) {
+                return handler.next(error);
               }
             }
           }
-          return handler.next(e);
+          return handler.next(error);
         },
       ),
     );
 
+  // ===========================================================================
+  // دالة تحديث التوكن (Refresh Token)
+  // ===========================================================================
   static Future<bool> refreshToken() async {
     try {
       final refreshTokenStr = await CacheHelper.getValue(CacheKeys.refreshToken);
@@ -63,7 +91,6 @@ abstract class APIHelper {
       return false; 
     }
   }
-
   static Future<Either<String, UserModel>> login({
     required String username,
     required String password,
@@ -97,7 +124,7 @@ abstract class APIHelper {
     required String password,
   }) async {
     try {
-      // 1. نقوم بإنشاء الحساب في الـ API
+      // 1. نقوم بإنشاء الحساب في الـ API أولاً
       await _dio.post(
         'register',
         data: FormData.fromMap({
@@ -106,8 +133,8 @@ abstract class APIHelper {
         }),
       );
       
-      // 2. التريك السحري: بما أن الـ Register مش بيرجع توكن، هنعمل Login تلقائي!
-      // الدالة دي هتروح تجيب التوكن، تحفظه في الكاش، وترجع بيانات المستخدم بأمان
+      // 2. التريك السحري لحل مشكلة (Token is missing):
+      // الـ API مش بيرجع توكن، فبنعمل Login صامت تلقائياً لجلب التوكن وحفظه في الكاش
       var loginResult = await login(username: username, password: password);
       
       return loginResult.fold(
@@ -221,7 +248,6 @@ abstract class APIHelper {
       }
     }
   }
-
   static Future<Either<String, List<TaskModel>>> getTasks() async {
     try {
       var response = await _dio.get('my_tasks');
